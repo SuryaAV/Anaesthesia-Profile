@@ -1,0 +1,52 @@
+Sub ExtractComorbidities()
+    Dim i As Long
+    Dim LastRow As Long
+    Dim CellValue As String
+    Dim HasComorbidities As Boolean
+    Dim Comorbidities As String
+    
+    LastRow = ActiveSheet.Cells(Rows.Count, "G").End(xlUp).Row 'Assuming diagnosis column is column G
+    
+    For i = 2 To LastRow 'assuming first row is header
+        CellValue = ActiveSheet.Cells(i, "G").Value 'assuming diagnosis column is column G
+        
+        'Storing existing values in columns H and I in columns J and K, respectively
+        If Not IsEmpty(ActiveSheet.Cells(i, "H")) Then
+            ActiveSheet.Cells(i, "J").Value = ActiveSheet.Cells(i, "H").Value
+        End If
+        
+        If Not IsEmpty(ActiveSheet.Cells(i, "I")) Then
+            ActiveSheet.Cells(i, "K").Value = ActiveSheet.Cells(i, "I").Value
+        End If
+        
+        'Extracting comorbidities
+        If InStr(1, CellValue, "DM", vbTextCompare) > 0 Or InStr(1, CellValue, "Diabetic", vbTextCompare) > 0 Then
+            HasComorbidities = True
+            Comorbidities = Comorbidities & "DM "
+        End If
+        
+        If InStr(1, CellValue, "HTN", vbTextCompare) > 0 Or InStr(1, CellValue, "Hypertension", vbTextCompare) > 0 Or InStr(1, CellValue, "Hypertensive", vbTextCompare) > 0 Then
+            HasComorbidities = True
+            Comorbidities = Comorbidities & "HTN "
+        End If
+        
+        If InStr(1, CellValue, "CKD", vbTextCompare) > 0 Then
+            HasComorbidities = True
+            Comorbidities = Comorbidities & "CKD "
+        End If
+        
+        'Inserting values in columns H and I
+        If HasComorbidities Then
+            ActiveSheet.Cells(i, "H").Value = Trim(Comorbidities)
+            ActiveSheet.Cells(i, "I").Value = "Yes"
+        Else
+            ActiveSheet.Cells(i, "H").Value = "-"
+            ActiveSheet.Cells(i, "I").Value = "No"
+        End If
+        
+        'Resetting variables for next iteration
+        HasComorbidities = False
+        Comorbidities = ""
+    Next i
+End Sub
+
